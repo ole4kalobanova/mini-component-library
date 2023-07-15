@@ -8,50 +8,63 @@ import VisuallyHidden from '../VisuallyHidden';
 const SIZES = {
   small: {
     "--borderRadius": 4 + "px",
-    "--height": "8px",
+    "--height": 8 + "px",
+    "--padding": 0
   },
   medium: {
     "--borderRadius": 4 + "px",
-    "--height": "12px",
+    "--height": 12 + "px",
+    "--padding": 0
   },
   large: {
     "--borderRadius": 8 + "px",
-    "--height": "24px",
-    "--padding": "4px"
+    "--height": 16 + "px",
+    "--padding": 4 + "px",
   }
 };
 
 const ProgressBar = ({ value, size }) => {
   const styles = SIZES[size];
-  const valueProgress = (value * 3.7);
+
+  if (!styles) {
+    throw new Error(`Unknow size passed to ProgressBar: ${size}`);
+  }
+
   return (
-    <WrapperBar role="progressbar" aria-valuenow={value} style={styles}>
-      <Prorgess
-        style={{
-          "--progress": (valueProgress > 370) ? '370px' : valueProgress + 'px',
-          "--height": size === "large" ? "16px" : styles["--height"],
-        }}
-      />
-    </WrapperBar>
+    <Wrapper
+      role="progressbar"
+      aria-valuenow={value}
+      aria-valuemin="0"
+      aria-valuemax="100"
+      style={styles}
+    >
+      <BarWrapper style={styles}>
+        <VisuallyHidden>{value}%</VisuallyHidden>
+        <Bar style={{"--width": value + '%',}}/>
+      </BarWrapper>
+    </Wrapper>
   );
 };
 
-const WrapperBar = styled.div`
+const Wrapper = styled.div`
   width: 370px;
-  height: var(--height);
-  background-color: ${COLORS.transparentGray35};
+  background-color: ${COLORS.transparentGray15};
   border-radius: var(--borderRadius);
   box-shadow: inset 0px 2px 4px ${COLORS.transparentGray35};
-  overflow: hidden;
-  display: inline-block;
   padding: var(--padding)
 `;
 
-const Prorgess = styled.div`
+const Bar = styled.div`
   background-color: ${COLORS.primary};
-  width: var(--progress);
-  height: var(--height);
   border-radius: 4px 0px 0px 4px;
-`
+  height: var(--height);
+  width: var(--width);
+`;
+
+const BarWrapper = styled.div`
+  border-radius: 4px;
+  /* Trim off corners when progress bar is near-full */
+  overflow: hidden;
+`;
 
 export default ProgressBar;
